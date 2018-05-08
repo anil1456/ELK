@@ -1,0 +1,26 @@
+input {
+   exec {
+      command => "bash 1.sh"
+      interval => 5
+      type => "hypervisor-stats"
+   }
+}
+filter {
+	if [type] == "hypervisor-stats" {
+              json {
+                    source => "message"
+              }
+
+}
+}
+output {
+  redis { host => "10.33.168.18"  data_type => "list" key => "hypervisor" codec => json_lines }
+}
+
+
+
+#!/bin/bash
+source /home/atlasadm/openrc
+a1=$(openstack token issue | grep -w id | awk '{print $4}')
+curl -X GET -H "X-Auth-Token: $a1" https://public.controller.local:8774/v2.1/os-hypervisors/statistics
+

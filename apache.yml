@@ -1,0 +1,31 @@
+input { 
+  file {
+    path => "/var/log/apache2/openstack-dashboard-access_log"
+    codec => json
+  }
+}
+
+filter{
+#  grok {
+#    match => { "message" => "%{COMMONAPACHELOG}" }
+#  }
+  grok {
+         match => [
+         "message" , "%{COMBINEDAPACHELOG}+%{GREEDYDATA:extra_fields}",
+         "message" , "%{COMMONAPACHELOG}+%{GREEDYDATA:extra_fields}"
+         ]
+         overwrite => [ "message" ]
+      }
+              json {
+                    source => "message"
+              }
+
+}
+
+output {
+  elasticsearch { 
+       hosts => "10.33.168.25:9200"
+       index => "apache"
+}
+}
+

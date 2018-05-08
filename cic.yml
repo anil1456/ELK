@@ -1,0 +1,42 @@
+root@cic-2:~/logstash-5.5.2# cat cic.yml 
+input { 
+  exec {
+    command => "sudo rabbitmqctl list_queues name memory | grep compute"
+    type => "rabbit_status"
+    interval => 10
+  }
+ }
+
+
+filter {
+
+	if [type] == "rabbit_status" {
+
+              split {
+
+ 
+
+              }
+
+              csv {
+
+                    columns => ["name", "amount"]
+
+                    separator => " "
+
+                    convert => { "amount" => "integer" }
+
+              }
+
+}
+}
+
+output {
+	redis {
+		host => "10.33.168.18:6379"
+		data_type => "list"
+		key => "cic-data"
+		codec => "json_lines"
+	}
+}
+

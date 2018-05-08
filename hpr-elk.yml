@@ -1,0 +1,15 @@
+input {
+  redis {
+    host => "10.33.168.18"
+    data_type => "list"
+    key => "hypervisor"
+    codec => json
+  }
+}
+output {
+  elasticsearch { 
+    hosts => "10.33.168.18:9200" 
+    index => "hypervisor-details"
+   }
+}
+
